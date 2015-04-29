@@ -4,16 +4,27 @@ require 'yaml'
 require 'sequel'
 require 'zlib'
 require 'fileutils'
+require 'socket'
 
-#LOGDIR = File::SEPARATOR + File.join("tmp", "ahlogs")
-LOGDIR = File::SEPARATOR + File.join("var", "log", "apache2")
+ld0 = File::SEPARATOR + File.join("tmp", "ahlogs")
+ld1 = File::SEPARATOR + File.join("var", "log", "apache2")
+
+host = Socket.gethostname
+if host =~ /dhcp|fhcrc/
+    LOGDIR = ld0
+elsif host =~ /^ip-/
+    LOGDIR = ld1
+else
+    raise "Don't know where the logs are!"
+end
+
 
 DB0 = Sequel.sqlite("file://#{Dir.pwd}/annotationhub.sqlite3")
 
 db1_path = File.join(Dir.pwd, "apachelogs.sqlite3")
 FileUtils.rm db1_path if File.exist? db1_path
 
-DB1 = Sequel.sqlite("file://#{Dir.pwd}/apachelogs.sqlite3")
+DB1 = Sequel.sqlite(db1_path)
 
 
 DB1.create_table(:entries) do
@@ -58,6 +69,7 @@ def parse(line)
     path = m.captures[2]
     return unless path.start_with? "/fetch/"
     num = path.split(' ').first.split('/').last.to_i
+    return if num == 0
     h = get_urls(num)
     return if h.nil?
     timestamp = DateTime.strptime(m.captures[1], "%d/%b/%Y:%H:%M:%S %z")
@@ -70,11 +82,11 @@ for log in logs
     f = File.open(logpath) do |f|
         if logpath.end_with? ".gz"
             gz = Zlib::GzipReader.new(f)
-            gz.each_line {|i| parse i}
+            gz.each_line {|i| parse i.strip}
             gz.close
         else
             lines = f.readlines
-            lines.each {|i| parse i}
+            lines.each {|i| parse i.strip}
         end
     end
 end
