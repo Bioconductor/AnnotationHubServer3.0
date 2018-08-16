@@ -2,9 +2,15 @@ require 'sequel'
 require 'yaml'
 require 'logger'
 
+## This script expects these values to be set in config.yml:
+## 'ahs_database_type'
+## 'mysql_url'
+## 'sqlite_filename'
+
 unless defined? DB
     basedir = File.dirname(__FILE__)
     config = YAML.load_file("#{basedir}/config.yml")
+    ENV['AHS_DATABASE_TYPE']=config['ahs_database_type']
 
     if `hostname` =~ /^ip-/ and ENV['AHS_DATABASE_TYPE'].nil?
         ENV['AHS_DATABASE_TYPE']='mysql'

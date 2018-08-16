@@ -1,15 +1,11 @@
-
-# Run me via cron.
-
-
-ENV['AHS_DATABASE_TYPE'] = 'mysql'
+## Run me via cron.
+## 'AHS_DATABASE_TYPE' must be set in crontab
 
 require './db_init.rb'
 require 'fileutils'
 require 'sequel'
 
 @basedir = File.dirname(__FILE__)
-
 
 timestamp =  DB[:timestamp].first[:timestamp]
 
@@ -22,7 +18,6 @@ DB2 = Sequel.connect(url2)
 
 table_created_at = DB2[:tables].where(:table_schema => 'annotationhub').max(:create_time)
 
-
 def convert_db()
     mysql2_url = @config['mysql_url'].sub(/^mysql:/, "mysql2:")
     outfile = "#{@basedir}/#{@config['sqlite_filename']}"
@@ -33,7 +28,6 @@ def convert_db()
     FileUtils.mv outfile_tmp, outfile
     #puts "does it exist? #{File.exists? outfile}"
 end
-
 
 if (File.exists?(cachefile))
     cached_time = Time.parse(File.readlines(cachefile).first)
@@ -47,5 +41,3 @@ end
 f = File.open(cachefile, "w")
 f.write(timestamp.to_s)
 f.close
-
-
