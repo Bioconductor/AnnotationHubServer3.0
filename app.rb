@@ -302,7 +302,7 @@ get "/newerthan/:date"  do
     # a date in the format 2014-04-01
     pd = params[:date]
     d = DateTime.strptime(pd, "%Y-%m-%d")
-    r = Resource.filter{rdatadateadded >  d}.all
+    r = Resource.filter(:status_id => '2').filter{rdatadateadded >  d}.all
     out = formatOutput(r)
     erb :resultsPage , :locals => {:result => out}
 end
@@ -310,7 +310,7 @@ end
 # accurate for ExperimentHub but not AnnotationHub
 # next version should have this as separate database field
 get "/package2/:pkg"  do
-    r = Resource.filter(:preparerclass => params[:pkg]).all
+    r = Resource.filter(:preparerclass => params[:pkg]).filter(:status_id => '2').all
     out = formatOutput(r)
     erb :resultsPage , :locals => {:result => out}
 end
@@ -323,7 +323,7 @@ get "/package/:pkg" do
         v = row.values
         out.push v[:resource_id]
     end
-    r = Resource.where(id: out).all
+    r = Resource.where(id: out).filter(:status_id => '2').all
     out = formatOutput(r)
     erb :resultsPage , :locals => {:result => out}
 end
@@ -331,7 +331,7 @@ end
 get "/title/:ttl"  do
     vl = params[:ttl]
     out = getIds(vl, "title")
-    r = Resource.where(id: out).all
+    r = Resource.where(id: out).filter(:status_id => '2').all
     out = formatOutput(r)
     erb :resultsPage , :locals => {:result => out}
 end
@@ -340,7 +340,7 @@ end
 get "/description/:desc"  do
     vl = params[:desc]
     out = getIds(vl, "description")
-    r = Resource.where(id: out).all
+    r = Resource.where(id: out).filter(:status_id => '2').all
     out = formatOutput(r)
     erb :resultsPage , :locals => {:result => out}
 end
@@ -360,7 +360,7 @@ end
 get "/dataprovider/:dp"  do
     vl = params[:dp]
     vl = vl.gsub("%20", " ")
-    r = Resource.where(Sequel.ilike(:dataprovider, "%#{vl}%")).all
+    r = Resource.where(Sequel.ilike(:dataprovider, "%#{vl}%")).filter(:status_id => '2').all
     out = formatOutput(r)
     erb :resultsPage , :locals => {:result => out}
 end
@@ -380,7 +380,7 @@ end
 get "/species/:spc"  do
     vl = params[:spc]
     vl = vl.gsub("%20", " ")
-    r = Resource.where(Sequel.ilike(:species, "%#{vl}%")).all
+    r = Resource.where(Sequel.ilike(:species, "%#{vl}%")).filter(:status_id => '2').all
     out = formatOutput(r)
     erb :resultsPage , :locals => {:result => out}
 end
@@ -398,7 +398,7 @@ get "/taxonomyid"  do
 end
 
 get "/taxonomyid/:tax"  do
-    r = Resource.filter(:taxonomyid => params[:tax]).all
+    r = Resource.filter(:taxonomyid => params[:tax]).filter(:status_id => '2').all
     out = formatOutput(r)
     erb :resultsPage , :locals => {:result => out}
 end
@@ -416,7 +416,7 @@ get "/genome"  do
 end
 
 get "/genome/:gn"  do
-    r = Resource.filter(:genome => params[:gn]).all
+    r = Resource.filter(:genome => params[:gn]).filter(:status_id => '2').all
     out = formatOutput(r)
     erb :resultsPage , :locals => {:result => out}
 end
@@ -434,7 +434,7 @@ get "/rdataclass"  do
 end
 
 get "/rdataclass/:rdc" do
-    r = Rdatapath.filter(:rdataclass => params[:rdc]).all
+    r = Rdatapath.filter(:rdataclass => params[:rdc]).filter(:status_id => '2').all
     out = []
     for row in r
         v = row.values
@@ -466,7 +466,7 @@ get "/rdatapath/:rdp" do
             out = out & find
         end
     end
-    r = Resource.where(id: out).all
+    r = Resource.where(id: out).filter(:status_id => '2').all
     out = formatOutput(r)
     erb :resultsPage , :locals => {:result => out}
 end
@@ -490,7 +490,7 @@ get "/sourcetype/:srct" do
         v = row.values
         out.push v[:resource_id]
     end
-    r = Resource.where(id: out).all
+    r = Resource.where(id: out).filter(:status_id => '2').all
     out = formatOutput(r)
     erb :resultsPage , :locals => {:result => out}
 end
@@ -514,7 +514,7 @@ get "/sourceversion/:srcv" do
         v = row.values
         out.push v[:resource_id]
     end
-    r = Resource.where(id: out).all
+    r = Resource.where(id: out).filter(:status_id => '2').all
     out = formatOutput(r)
     erb :resultsPage , :locals => {:result => out}
 end
@@ -540,7 +540,7 @@ get "/sourceurl/:srcurl" do
             out = out & find
         end
     end
-    r = Resource.where(id: out).all
+    r = Resource.where(id: out).filter(:status_id => '2').all
     out = formatOutput(r)
     erb :resultsPage , :locals => {:result => out}
 end
@@ -600,7 +600,7 @@ get '/query/:qry' do
              allidx = allidx & idx
              dx  = dx + 1
          end
-         r = Resource.where(id: allidx).all
+         r = Resource.where(id: allidx).filter(:status_id => '2').all
          out = formatOutput(r)
          erb :resultsPage , :locals => {:result => out}
     end
