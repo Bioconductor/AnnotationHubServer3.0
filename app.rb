@@ -434,13 +434,13 @@ get "/rdataclass"  do
 end
 
 get "/rdataclass/:rdc" do
-    r = Rdatapath.filter(:rdataclass => params[:rdc]).filter(:status_id => '2').all
+    r = Rdatapath.filter(:rdataclass => params[:rdc]).all
     out = []
     for row in r
         v = row.values
         out.push v[:resource_id]
     end
-    r = Resource.where(id: out).all
+    r = Resource.where(id: out).filter(:status_id => '2').all
     out = formatOutput(r)
     erb :resultsPage , :locals => {:result => out}
 end
