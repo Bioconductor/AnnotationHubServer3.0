@@ -617,6 +617,7 @@ get '/fetch/:id' do
     unless prefix == "http://s3.amazonaws.com/annotationhub/"
         # FIXME only do this if we are on production...
         log_request(request, url_string, rp.id, resource.id)
+    end
 
     url = URI.parse(url_string)
     req = Net::HTTP.new(url.host, url.port)
