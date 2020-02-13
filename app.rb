@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'sinatra'
-require 'mysql'
+require 'mysql2'
 require 'date'
 require 'pp'
 require 'json'
