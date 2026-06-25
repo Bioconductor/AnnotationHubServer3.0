@@ -9,7 +9,7 @@ require 'tmpdir'
 require 'socket'
 require 'cgi'
 require_relative './db_init'
-#require_relative './logging_init'
+require_relative './logging_init'
 
 PRODUCTION = !(Socket.gethostname() =~ /^ip-/).nil?
 
@@ -36,24 +36,24 @@ helpers do
         @auth.credentials == ['admin', config['admin_password']]
     end
 
-    # def log_request(request, url, rdatapath_id, resource_id)
-    #     # FIXME only do this if we are on production!
-    #     begin # don't let logging interfere with redirection
-    #         # do we need a transaction for one statement?
-    #         LOGGING_DB[:log_entries].insert(
-    #             :timestamp => DateTime.now,
-    #             :remote_ip => request.ip,
-    #             :url => url,
-    #             :resource_fetched => resource_id,
-    #             :id_fetched => rdatapath_id,
-    #             :is_s3 => false,
-    #             :referrer => request.referrer,
-    #             :user_agent => request.user_agent
-    #         )
-    #     rescue Exception => ex# handle specific exceptions?
-    #         puts "exception: #{ex.message}"
-    #     end
-    # end
+    def log_request(request, url, rdatapath_id, resource_id)
+        # FIXME only do this if we are on production!
+        begin # don't let logging interfere with redirection
+            # do we need a transaction for one statement?
+            LOGGING_DB[:log_entries].insert(
+                :timestamp => DateTime.now,
+                :remote_ip => request.ip,
+                :url => url,
+                :resource_fetched => resource_id,
+                :id_fetched => rdatapath_id,
+                :is_s3 => false,
+                :referrer => request.referrer,
+                :user_agent => request.user_agent
+            )
+        rescue Exception => ex# handle specific exceptions?
+            puts "exception: #{ex.message}"
+        end
+    end
 
 end
 
@@ -615,7 +615,7 @@ get '/fetch/:id' do
     url_string = prefix + path
     unless prefix == "http://s3.amazonaws.com/annotationhub/"
         # FIXME only do this if we are on production...
-        # log_request(request, url_string, rp.id, resource.id)
+        log_request(request, url_string, rp.id, resource.id)
     end
 
     urlEnt = url_string.split("/")
@@ -632,7 +632,7 @@ get '/log_fetch' do
     url = prefix + path
     unless prefix == "http://s3.amazonaws.com/annotationhub/"
         # FIXME only do this if we are on production...
-        # log_request(request, url, rp.id, resource.id)
+        log_request(request, url, rp.id, resource.id)
     end
     url
 end
